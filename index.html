@@ -472,6 +472,33 @@
   }
   .add-task-toggle:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
 
+  /* ── Quick icon buttons in section header ── */
+  .quick-icon-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    flex: 1;
+    justify-content: flex-end;
+    padding: 0 6px;
+  }
+  .quick-icon-btn {
+    width: 30px; height: 30px;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.5);
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+  .quick-icon-btn:hover {
+    background: white;
+    transform: scale(1.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .quick-icon-btn:active { transform: scale(0.95); }
+
   /* ── Config view ── */
   .config-view { padding: 20px; max-width: 600px; margin: 0 auto; }
   .config-view h2 {
@@ -721,6 +748,7 @@
 <div class="tabs">
   <button class="tab active" onclick="switchTab('plan', this)">📋 Plan</button>
   <button class="tab" onclick="switchTab('config', this)">⚙️ Tasks</button>
+  <button class="tab" onclick="switchTab('quickicons', this)">⚡ Quick Icons</button>
 </div>
 
 <!-- PLAN VIEW -->
@@ -770,6 +798,17 @@
   </div>
 </div>
 
+<!-- QUICK ICONS VIEW -->
+<div id="view-quickicons" class="view">
+  <div class="config-view">
+    <h2>Quick Icon Buttons</h2>
+    <p class="config-subtitle">These icon buttons appear in every section header for one-tap adding. Tap the icon to change it, edit the label, or remove it.</p>
+    <div class="config-task-list" id="quick-icon-list"></div>
+    <button class="add-task-btn" onclick="addNewQuickIcon()">＋ Add quick icon</button>
+    <button class="save-config-btn" onclick="saveQuickIcons()">Save quick icons</button>
+  </div>
+</div>
+
 <!-- Emoji picker -->
 <div class="emoji-picker" id="emoji-picker" style="display:none">
   <div class="emoji-grid" id="emoji-grid"></div>
@@ -801,14 +840,30 @@ const DEFAULT_TASKS = [
 ];
 
 const SECTIONS = [
-  { id: 'morning',   icon: '🌤️',  title: 'Before Breakfast', cls: 'section-before'  },
-  { id: 'breakfast', icon: '🍳',  title: 'Breakfast',         cls: 'section-break-b', meal: true },
-  { id: 'midday',    icon: '☀️',  title: 'Before Lunch',     cls: 'section-midday'  },
-  { id: 'lunch',     icon: '🥗',  title: 'Lunch',             cls: 'section-break-l', meal: true },
-  { id: 'afternoon', icon: '🌆',  title: 'After Lunch',      cls: 'section-after'   },
-  { id: 'dinner',    icon: '🍽️',  title: 'Dinner',            cls: 'section-dinner',  meal: true },
-  { id: 'afterdinner', icon: '🌙', title: 'After Dinner',    cls: 'section-latenight' },
+  { id: 'morning',     icon: '🌤️',  title: 'Morning',    cls: 'section-before'    },
+  { id: 'breakfast',   icon: '🍳',  title: 'Breakfast',  cls: 'section-break-b', meal: true },
+  { id: 'midday',      icon: '☀️',  title: 'Midday',     cls: 'section-midday'    },
+  { id: 'lunch',       icon: '🥗',  title: 'Lunch',      cls: 'section-break-l', meal: true },
+  { id: 'afternoon',   icon: '🌆',  title: 'Afternoon',  cls: 'section-after'     },
+  { id: 'dinner',      icon: '🍽️',  title: 'Dinner',     cls: 'section-dinner',  meal: true },
+  { id: 'afterdinner', icon: '🌙',  title: 'Evening',    cls: 'section-latenight' },
 ];
+
+const DEFAULT_QUICK_ICONS = [
+  { icon: '☕', label: 'Coffee' },
+  { icon: '💊', label: 'Vitamins' },
+  { icon: '💧', label: 'Water' },
+  { icon: '🏃', label: 'Run' },
+  { icon: '📖', label: 'Read' },
+  { icon: '🧘', label: 'Meditate' },
+];
+
+// Meal sections get a default "Eat" task when first loaded
+const MEAL_DEFAULTS = {
+  breakfast: { icon: '🍳', label: 'Eat breakfast' },
+  lunch:     { icon: '🥗', label: 'Eat lunch' },
+  dinner:    { icon: '🍽️', label: 'Eat dinner' },
+};
 
 const EMOJIS = [
   '🏋️','🚶','🧘','📚','✏️','🛒','👕','📧','📞','🧴','🤸','🧹','💡','💊','💧',
@@ -831,15 +886,15 @@ function loadState() {
     if (raw) {
       const s = JSON.parse(raw);
       if (!s.tasks) s.tasks = [...DEFAULT_TASKS];
-      return { tasks: s.tasks };
+      if (!s.quickIcons) s.quickIcons = [...DEFAULT_QUICK_ICONS];
+      return { tasks: s.tasks, quickIcons: s.quickIcons };
     }
   } catch(e) {}
-  return { tasks: [...DEFAULT_TASKS] };
+  return { tasks: [...DEFAULT_TASKS], quickIcons: [...DEFAULT_QUICK_ICONS] };
 }
 
 function saveState() {
-  // Only persist tasks in main state key
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks: state.tasks }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks: state.tasks, quickIcons: state.quickIcons }));
 }
 
 function planKey(dateStr) {
@@ -851,7 +906,6 @@ function loadPlan(dateStr) {
     const raw = localStorage.getItem(planKey(dateStr));
     if (raw) {
       const p = JSON.parse(raw);
-      // ensure all section keys exist
       const empty = EMPTY_PLAN();
       for (const key of Object.keys(empty)) {
         if (!p[key]) p[key] = [];
@@ -859,7 +913,12 @@ function loadPlan(dateStr) {
       return p;
     }
   } catch(e) {}
-  return EMPTY_PLAN();
+  // New plan — seed meal sections with default eat tasks
+  const p = EMPTY_PLAN();
+  for (const [secId, def] of Object.entries(MEAL_DEFAULTS)) {
+    p[secId].push({ icon: def.icon, label: def.label, done: false, time: '' });
+  }
+  return p;
 }
 
 function savePlan(dateStr, plan) {
@@ -963,19 +1022,40 @@ function renderSections() {
     const doneCount = items.filter(i => i.done).length;
     const card = document.createElement('div');
     card.className = `section-card ${sec.cls}`;
-    card.innerHTML = `
-      <div class="section-header">
-        <span class="section-icon">${sec.icon}</span>
-        <span class="section-title">${sec.title}</span>
-        <span class="section-count">${doneCount}/${items.length}</span>
-      </div>
-      <div class="section-body" id="body-${sec.id}">
-        ${items.length === 0 ? `<div class="drop-hint">Drop tasks here or add below</div>` : ''}
-      </div>
+
+    const headerEl = document.createElement('div');
+    headerEl.className = 'section-header';
+    headerEl.innerHTML = `
+      <span class="section-icon">${sec.icon}</span>
+      <span class="section-title">${sec.title}</span>
+      <div class="quick-icon-row" id="quick-row-${sec.id}"></div>
+      <span class="section-count">${doneCount}/${items.length}</span>
     `;
+    card.appendChild(headerEl);
+
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'section-body';
+    bodyEl.id = `body-${sec.id}`;
+    if (items.length === 0) bodyEl.innerHTML = `<div class="drop-hint">Drop tasks here or add below</div>`;
+    card.appendChild(bodyEl);
     container.appendChild(card);
 
-    const body = card.querySelector('.section-body');
+    // Quick-icon buttons in header
+    const quickRow = headerEl.querySelector(`#quick-row-${sec.id}`);
+    for (const qi of state.quickIcons) {
+      const btn = document.createElement('button');
+      btn.className = 'quick-icon-btn';
+      btn.title = qi.label;
+      btn.textContent = qi.icon;
+      btn.addEventListener('click', () => {
+        plan[sec.id].push({ icon: qi.icon, label: qi.label, done: false, time: '' });
+        saveCurrent();
+        render();
+      });
+      quickRow.appendChild(btn);
+    }
+
+    const body = bodyEl;
 
     // Palette drag-drop onto section
     body.addEventListener('dragover', e => {
@@ -1002,7 +1082,6 @@ function renderSections() {
     // Render items
     for (let idx = 0; idx < items.length; idx++) {
       const item = items[idx];
-      // One-off items store label/icon directly; library items look up by taskId
       const isOneOff = !item.taskId;
       const task = isOneOff
         ? { icon: item.icon || '📌', label: item.label || '' }
@@ -1339,11 +1418,19 @@ function renderConfigList() {
     const el = document.createElement('div');
     el.className = 'config-task';
     el.innerHTML = `
-      <button class="task-icon-input" onclick="openEmojiPicker(${i}, this)">${t.icon}</button>
-      <input class="label-input" value="${t.label}" onchange="editTasks[${i}].label=this.value" placeholder="Task name">
-      <label class="once-toggle"><input type="checkbox" ${t.once ? 'checked' : ''} onchange="editTasks[${i}].once=this.checked"> Once only</label>
-      <button class="delete-task-btn" onclick="deleteConfigTask(${i})">×</button>
+      <button class="task-icon-input">${t.icon}</button>
+      <input class="label-input" value="${t.label}" placeholder="Task name">
+      <label class="once-toggle"><input type="checkbox" ${t.once ? 'checked' : ''}> Once only</label>
+      <button class="delete-task-btn">×</button>
     `;
+    const iconBtn = el.querySelector('.task-icon-input');
+    const labelInput = el.querySelector('.label-input');
+    const onceCheck = el.querySelector('input[type=checkbox]');
+    const delBtn = el.querySelector('.delete-task-btn');
+    iconBtn.addEventListener('click', function() { openEmojiPicker(i, this, 'task'); });
+    labelInput.addEventListener('input', () => { editTasks[i].label = labelInput.value; });
+    onceCheck.addEventListener('change', () => { editTasks[i].once = onceCheck.checked; });
+    delBtn.addEventListener('click', () => deleteConfigTask(i));
     container.appendChild(el);
   }
 }
@@ -1375,9 +1462,56 @@ function saveConfig() {
   switchTab('plan', document.querySelector('.tab'));
 }
 
+// ── Quick Icons Config ────────────────────────────────────────────────────────
+let editQuickIcons = [];
+
+function renderQuickIconConfig() {
+  editQuickIcons = state.quickIcons.map(q => ({ ...q }));
+  renderQuickIconList();
+}
+
+function renderQuickIconList() {
+  const container = document.getElementById('quick-icon-list');
+  container.innerHTML = '';
+  for (let i = 0; i < editQuickIcons.length; i++) {
+    const q = editQuickIcons[i];
+    const el = document.createElement('div');
+    el.className = 'config-task';
+    el.innerHTML = `
+      <button class="task-icon-input qi-icon-btn" data-qi="${i}">${q.icon}</button>
+      <input class="label-input" value="${q.label}" placeholder="Label" oninput="editQuickIcons[${i}].label=this.value">
+      <button class="delete-task-btn" onclick="deleteQuickIcon(${i})">×</button>
+    `;
+    el.querySelector('.qi-icon-btn').addEventListener('click', function() {
+      openEmojiPicker(i, this, 'quickicon');
+    });
+    container.appendChild(el);
+  }
+}
+
+function addNewQuickIcon() {
+  editQuickIcons.push({ icon: '⭐', label: 'New' });
+  renderQuickIconList();
+}
+
+function deleteQuickIcon(i) {
+  editQuickIcons.splice(i, 1);
+  renderQuickIconList();
+}
+
+function saveQuickIcons() {
+  state.quickIcons = editQuickIcons.map(q => ({ ...q }));
+  saveState();
+  showToast('Quick icons saved ✓');
+  switchTab('plan', document.querySelector('.tab'));
+}
+
 // ── Emoji picker ─────────────────────────────────────────────────────────────
-function openEmojiPicker(taskIdx, btn) {
-  currentEmojiTarget = taskIdx;
+let emojiPickerContext = 'task'; // 'task' or 'quickicon'
+
+function openEmojiPicker(idx, btn, context = 'task') {
+  emojiPickerContext = context;
+  currentEmojiTarget = idx;
   const picker = document.getElementById('emoji-picker');
   const grid = document.getElementById('emoji-grid');
   grid.innerHTML = '';
@@ -1389,14 +1523,22 @@ function openEmojiPicker(taskIdx, btn) {
     grid.appendChild(el);
   }
   const rect = btn.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
   picker.style.display = 'block';
   picker.style.left = Math.min(rect.left, window.innerWidth - 260) + 'px';
-  picker.style.top = (rect.bottom + 6) + 'px';
+  picker.style.top = spaceBelow > 220
+    ? (rect.bottom + 6) + 'px'
+    : Math.max(8, rect.top - picker.offsetHeight - 6) + 'px';
 }
 
 function pickEmoji(emoji) {
-  editTasks[currentEmojiTarget].icon = emoji;
-  renderConfigList();
+  if (emojiPickerContext === 'quickicon') {
+    editQuickIcons[currentEmojiTarget].icon = emoji;
+    renderQuickIconList();
+  } else {
+    editTasks[currentEmojiTarget].icon = emoji;
+    renderConfigList();
+  }
   document.getElementById('emoji-picker').style.display = 'none';
 }
 
@@ -1413,13 +1555,14 @@ function switchTab(name, btn) {
   document.getElementById('view-' + name).classList.add('active');
   btn.classList.add('active');
   if (name === 'config') renderConfig();
+  if (name === 'quickicons') renderQuickIconConfig();
   if (name === 'plan') render();
 }
 
 // Force clicking the right tab button
 document.querySelectorAll('.tab').forEach((btn, i) => {
   btn.onclick = function() {
-    const names = ['plan', 'config'];
+    const names = ['plan', 'config', 'quickicons'];
     switchTab(names[i], btn);
   };
 });
