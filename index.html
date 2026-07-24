@@ -499,6 +499,155 @@
   }
   .quick-icon-btn:active { transform: scale(0.95); }
 
+  /* ── Edit item popover ── */
+  .edit-popover {
+    position: fixed;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 14px;
+    z-index: 1000;
+    width: 260px;
+  }
+  .edit-popover h4 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    color: var(--ink-soft);
+  }
+  .edit-popover-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .edit-icon-btn {
+    width: 38px; height: 38px;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    font-size: 20px;
+    background: var(--paper);
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .edit-icon-btn:hover { border-color: var(--accent); }
+  .edit-label-input {
+    flex: 1;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  .edit-label-input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .edit-popover-btns { display: flex; gap: 8px; }
+  .edit-popover-btns button {
+    flex: 1; padding: 8px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--rule);
+    transition: all 0.15s;
+  }
+  .edit-btn-save { background: var(--ink); color: white; border-color: var(--ink) !important; }
+  .edit-btn-save:hover { background: var(--accent) !important; border-color: var(--accent) !important; }
+  .edit-btn-cancel { background: white; color: var(--ink-soft); }
+  .edit-btn-cancel:hover { border-color: var(--ink-soft) !important; }
+
+  /* Make item label clickable hint */
+  .item-label { flex: 1; font-size: 14px; font-weight: 500; cursor: pointer; }
+  .item-label:hover { color: var(--accent); }
+
+  /* ── Quick option popover ── */
+  .quick-option-popover {
+    position: fixed;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 10px;
+    z-index: 600;
+    min-width: 180px;
+    max-width: 260px;
+  }
+  .quick-option-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--ink-faint);
+    padding: 2px 6px 8px;
+  }
+  .quick-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.1s;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .quick-option-btn:hover { background: var(--accent-light); color: var(--accent); }
+
+  /* ── Quick icon options config ── */
+  .qi-options-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 12px;
+    border-left: 2px solid var(--rule);
+  }
+  .qi-option-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .qi-option-input {
+    flex: 1;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  .qi-option-input:focus { outline: 1px solid var(--accent); border-color: transparent; }
+  .qi-option-del {
+    background: transparent; border: none;
+    color: var(--ink-faint); cursor: pointer;
+    font-size: 15px; padding: 2px 4px; border-radius: 4px;
+    transition: all 0.12s;
+  }
+  .qi-option-del:hover { color: #c44; background: #fee; }
+  .qi-add-option-btn {
+    margin-top: 4px;
+    padding: 5px 10px;
+    border: 1px dashed var(--rule);
+    border-radius: 6px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .qi-add-option-btn:hover { border-color: var(--accent); color: var(--accent); }
+
   /* ── Config view ── */
   .config-view { padding: 20px; max-width: 600px; margin: 0 auto; }
   .config-view h2 {
@@ -850,12 +999,12 @@ const SECTIONS = [
 ];
 
 const DEFAULT_QUICK_ICONS = [
-  { icon: '☕', label: 'Coffee' },
-  { icon: '💊', label: 'Vitamins' },
-  { icon: '💧', label: 'Water' },
-  { icon: '🏃', label: 'Run' },
-  { icon: '📖', label: 'Read' },
-  { icon: '🧘', label: 'Meditate' },
+  { icon: '☕', label: 'Coffee', options: ['☕ Coffee', '🍵 Tea', '🧃 Juice', '🥛 Milk'] },
+  { icon: '💊', label: 'Vitamins', options: ['💊 Vitamins', '🫧 Supplements'] },
+  { icon: '💧', label: 'Water', options: ['💧 Water', '🥤 Smoothie', '🧃 Juice'] },
+  { icon: '🏃', label: 'Run', options: ['🏃 Run', '🚶 Walk', '🚴 Cycle', '🏊 Swim', '🤸 Stretch'] },
+  { icon: '📖', label: 'Read', options: ['📖 Read', '📚 Study', '🎧 Podcast'] },
+  { icon: '🧘', label: 'Meditate', options: ['🧘 Meditate', '🌬️ Breathwork', '😴 Nap'] },
 ];
 
 // Meal sections get a default "Eat" task when first loaded
@@ -887,6 +1036,11 @@ function loadState() {
       const s = JSON.parse(raw);
       if (!s.tasks) s.tasks = [...DEFAULT_TASKS];
       if (!s.quickIcons) s.quickIcons = [...DEFAULT_QUICK_ICONS];
+      // migrate: ensure each quick icon has an options array
+      s.quickIcons = s.quickIcons.map((q, i) => ({
+        ...q,
+        options: q.options || (DEFAULT_QUICK_ICONS[i]?.options || [q.icon + ' ' + q.label])
+      }));
       return { tasks: s.tasks, quickIcons: s.quickIcons };
     }
   } catch(e) {}
@@ -1047,10 +1201,9 @@ function renderSections() {
       btn.className = 'quick-icon-btn';
       btn.title = qi.label;
       btn.textContent = qi.icon;
-      btn.addEventListener('click', () => {
-        plan[sec.id].push({ icon: qi.icon, label: qi.label, done: false, time: '' });
-        saveCurrent();
-        render();
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showQuickOptionPopover(qi, sec.id, btn);
       });
       quickRow.appendChild(btn);
     }
@@ -1105,6 +1258,7 @@ function renderSections() {
       el.querySelector('.remove-btn').addEventListener('click', () => removeItem(sec.id, idx));
       el.querySelector('.up-btn').addEventListener('click', () => moveItem(sec.id, idx, -1));
       el.querySelector('.dn-btn').addEventListener('click', () => moveItem(sec.id, idx, +1));
+      el.querySelector('.item-label').addEventListener('click', (e) => showEditItemPopover(sec.id, idx, e.currentTarget));
       body.appendChild(el);
     }
 
@@ -1283,6 +1437,155 @@ function removeItem(sectionId, idx) {
   plan[sectionId].splice(idx, 1);
   saveCurrent();
   render();
+}
+
+function closePopovers() {
+  document.getElementById('quick-option-popover')?.remove();
+  document.getElementById('quick-option-backdrop')?.remove();
+  document.getElementById('edit-item-popover')?.remove();
+  document.getElementById('edit-item-backdrop')?.remove();
+  document.getElementById('time-popover')?.remove();
+}
+
+function showQuickOptionPopover(qi, sectionId, anchor) {
+  closePopovers();
+
+  const options = qi.options && qi.options.length ? qi.options : [qi.icon + ' ' + qi.label];
+
+  // If only one option, add directly
+  if (options.length === 1) {
+    const [icon, ...rest] = options[0].split(' ');
+    plan[sectionId].push({ icon, label: rest.join(' ') || qi.label, done: false, time: '' });
+    saveCurrent();
+    render();
+    return;
+  }
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'quick-option-backdrop';
+  backdrop.style.cssText = 'position:fixed;inset:0;z-index:599;';
+  document.body.appendChild(backdrop);
+
+  const pop = document.createElement('div');
+  pop.className = 'quick-option-popover';
+  pop.id = 'quick-option-popover';
+
+  const title = document.createElement('div');
+  title.className = 'quick-option-title';
+  title.textContent = 'Add to ' + SECTIONS.find(s => s.id === sectionId)?.title;
+  pop.appendChild(title);
+
+  for (const opt of options) {
+    // opt format: "emoji label" e.g. "☕ Coffee"
+    const parts = opt.trim().split(' ');
+    const icon = parts[0];
+    const label = parts.slice(1).join(' ') || opt;
+    const btn = document.createElement('button');
+    btn.className = 'quick-option-btn';
+    btn.innerHTML = `<span>${icon}</span><span>${label}</span>`;
+    btn.addEventListener('click', () => {
+      closePopovers();
+      plan[sectionId].push({ icon, label, done: false, time: '' });
+      saveCurrent();
+      render();
+    });
+    pop.appendChild(btn);
+  }
+
+  document.body.appendChild(pop);
+  backdrop.addEventListener('click', closePopovers);
+
+  // Position
+  const rect = anchor.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  pop.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+  const popH = pop.offsetHeight || (options.length * 44 + 40);
+  pop.style.top = spaceBelow > popH + 8
+    ? (rect.bottom + 4) + 'px'
+    : Math.max(8, rect.top - popH - 4) + 'px';
+}
+
+function showEditItemPopover(sectionId, idx, anchor) {
+  closePopovers();
+
+  const item = plan[sectionId][idx];
+  const isOneOff = !item.taskId;
+  const task = isOneOff
+    ? { icon: item.icon || '📌', label: item.label || '' }
+    : (state.tasks.find(t => t.id === item.taskId) || { icon: '📌', label: '' });
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'edit-item-backdrop';
+  backdrop.style.cssText = 'position:fixed;inset:0;z-index:599;';
+  document.body.appendChild(backdrop);
+
+  const pop = document.createElement('div');
+  pop.className = 'edit-popover';
+  pop.id = 'edit-item-popover';
+
+  let currentIcon = task.icon;
+
+  pop.innerHTML = `
+    <h4>Edit task</h4>
+    <div class="edit-popover-row">
+      <button class="edit-icon-btn" id="edit-icon-btn" title="Change icon">${currentIcon}</button>
+      <input class="edit-label-input" id="edit-label-input" value="${task.label}" placeholder="Task name" maxlength="60">
+    </div>
+    <div class="edit-popover-btns">
+      <button class="edit-btn-cancel">Cancel</button>
+      <button class="edit-btn-save">Save</button>
+    </div>
+  `;
+
+  document.body.appendChild(pop);
+  backdrop.addEventListener('click', closePopovers);
+
+  // Position near anchor
+  const rect = anchor.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  pop.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+  const popH = pop.offsetHeight || 140;
+  pop.style.top = spaceBelow > popH + 8
+    ? (rect.bottom + 4) + 'px'
+    : Math.max(8, rect.top - popH - 4) + 'px';
+
+  const labelInput = pop.querySelector('#edit-label-input');
+  labelInput.focus();
+  labelInput.select();
+
+  // Emoji picker for icon
+  pop.querySelector('#edit-icon-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openEmojiPicker(-1, pop.querySelector('#edit-icon-btn'), 'edititem');
+    // Store a reference so pickEmoji can update us
+    window._editItemIconTarget = (emoji) => {
+      currentIcon = emoji;
+      pop.querySelector('#edit-icon-btn').textContent = emoji;
+    };
+  });
+
+  pop.querySelector('.edit-btn-cancel').addEventListener('click', closePopovers);
+
+  pop.querySelector('.edit-btn-save').addEventListener('click', () => {
+    const newLabel = labelInput.value.trim();
+    if (!newLabel) { labelInput.focus(); return; }
+    // Always convert to one-off on edit (detach from library task)
+    plan[sectionId][idx] = {
+      ...plan[sectionId][idx],
+      taskId: undefined,
+      icon: currentIcon,
+      label: newLabel,
+    };
+    delete plan[sectionId][idx].taskId;
+    closePopovers();
+    saveCurrent();
+    render();
+  });
+
+  labelInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') pop.querySelector('.edit-btn-save').click();
+    if (e.key === 'Escape') closePopovers();
+  });
 }
 
 function showTimePopover(sectionId, idx, anchor) {
@@ -1477,14 +1780,67 @@ function renderQuickIconList() {
     const q = editQuickIcons[i];
     const el = document.createElement('div');
     el.className = 'config-task';
-    el.innerHTML = `
-      <button class="task-icon-input qi-icon-btn" data-qi="${i}">${q.icon}</button>
-      <input class="label-input" value="${q.label}" placeholder="Label" oninput="editQuickIcons[${i}].label=this.value">
-      <button class="delete-task-btn" onclick="deleteQuickIcon(${i})">×</button>
+    el.style.flexDirection = 'column';
+    el.style.alignItems = 'stretch';
+    el.style.gap = '10px';
+
+    const topRow = document.createElement('div');
+    topRow.style.cssText = 'display:flex;align-items:center;gap:12px;';
+    topRow.innerHTML = `
+      <button class="task-icon-input qi-icon-btn">${q.icon}</button>
+      <input class="label-input" value="${q.label}" placeholder="Button label" style="flex:1">
+      <button class="delete-task-btn">×</button>
     `;
-    el.querySelector('.qi-icon-btn').addEventListener('click', function() {
-      openEmojiPicker(i, this, 'quickicon');
-    });
+    topRow.querySelector('.qi-icon-btn').addEventListener('click', function() { openEmojiPicker(i, this, 'quickicon'); });
+    topRow.querySelector('.label-input').addEventListener('input', e => { editQuickIcons[i].label = e.target.value; });
+    topRow.querySelector('.delete-task-btn').addEventListener('click', () => deleteQuickIcon(i));
+    el.appendChild(topRow);
+
+    // Options list
+    const optSection = document.createElement('div');
+    optSection.innerHTML = `<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-faint);margin-bottom:4px;">Pick list options</div>`;
+    const optList = document.createElement('div');
+    optList.className = 'qi-options-list';
+
+    const opts = q.options || [];
+    const renderOpts = () => {
+      optList.innerHTML = '';
+      for (let j = 0; j < editQuickIcons[i].options.length; j++) {
+        const row = document.createElement('div');
+        row.className = 'qi-option-row';
+        const inp = document.createElement('input');
+        inp.className = 'qi-option-input';
+        inp.value = editQuickIcons[i].options[j];
+        inp.placeholder = 'e.g. ☕ Coffee';
+        inp.addEventListener('input', e => { editQuickIcons[i].options[j] = e.target.value; });
+        const del = document.createElement('button');
+        del.className = 'qi-option-del';
+        del.textContent = '×';
+        del.addEventListener('click', () => {
+          editQuickIcons[i].options.splice(j, 1);
+          renderOpts();
+        });
+        row.appendChild(inp);
+        row.appendChild(del);
+        optList.appendChild(row);
+      }
+      const addBtn = document.createElement('button');
+      addBtn.className = 'qi-add-option-btn';
+      addBtn.textContent = '＋ Add option';
+      addBtn.addEventListener('click', () => {
+        editQuickIcons[i].options.push('');
+        renderOpts();
+        // Focus last input
+        const inputs = optList.querySelectorAll('.qi-option-input');
+        inputs[inputs.length - 1]?.focus();
+      });
+      optList.appendChild(addBtn);
+    };
+
+    if (!editQuickIcons[i].options) editQuickIcons[i].options = [];
+    renderOpts();
+    optSection.appendChild(optList);
+    el.appendChild(optSection);
     container.appendChild(el);
   }
 }
@@ -1535,6 +1891,8 @@ function pickEmoji(emoji) {
   if (emojiPickerContext === 'quickicon') {
     editQuickIcons[currentEmojiTarget].icon = emoji;
     renderQuickIconList();
+  } else if (emojiPickerContext === 'edititem') {
+    window._editItemIconTarget && window._editItemIconTarget(emoji);
   } else {
     editTasks[currentEmojiTarget].icon = emoji;
     renderConfigList();
